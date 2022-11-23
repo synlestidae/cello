@@ -16,6 +16,7 @@ impl Actor for Canvas {
 }
 
 struct Canvas {
+    time: Instant,
     width: f32,
     height: f32,
     cells: Vec<Addr<Cell>>,
@@ -81,6 +82,15 @@ impl Handler<CellTick> for Cell {
     }
 }
 
+impl Handler<ActivateCanvas> for Canvas {
+    type Result = Response<()>;
+
+    fn handle(&mut self, _: ActivateCanvas, ctx:  &mut Context<Self>) -> Self::Result) {
+        // we'll spawn a timer
+        todo!("ctx.run_interval()")
+    }
+}
+
 struct Cell {
     id: Uuid,
     name: String,
@@ -99,6 +109,11 @@ struct CellInfo {
 
 impl Actor for Cell {
     type Context = Context<Self>;
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+struct ActivateCanvas {
 }
 
 #[derive(Message)]
