@@ -13,7 +13,7 @@ use std::thread::spawn;
 use std::time::Duration;
 use std::time::Instant;
 
-use druid::piet::kurbo::Circle;
+use druid::piet::kurbo::{Circle, Rect};
 use druid::widget::{Align, Flex, Label, Painter, TextBox};
 use druid::{
     AppLauncher, Color, Data, Env, Lens, LocalizedString, Point, RenderContext, Selector, Target,
@@ -32,6 +32,7 @@ impl Data for MyData {
 const VERTICAL_WIDGET_SPACING: f64 = 20.0;
 const TEXT_BOX_WIDTH: f64 = 200.0;
 const WINDOW_TITLE: LocalizedString<HelloState> = LocalizedString::new("Cell-O!");
+const FPS: u64 = 60;
 
 #[derive(Clone, Data, Lens)]
 struct HelloState {
@@ -75,7 +76,7 @@ fn main() {
     // start the application
     //spawn(move || {
     println!("Spawn!");
-    let my_painter = move || {
+    let my_painter = {
         Painter::new(move |ctx, data: &MyData, _| {
             let bounds = ctx.size().to_rect();
             let (x0, y0, x1, y1) = (bounds.x0, bounds.y0, bounds.x1, bounds.y1);
@@ -110,7 +111,9 @@ fn main() {
                     },
                     radius_scaled,
                 );
+                let background = Rect::new(x0, y0, x1, y1);
                 println!("Circle {:?}", circle);
+                ctx.fill(background, &Color::Rgba32(0xFFFFFF));
                 ctx.fill(circle, &Color::Rgba32(0xABCDEF));
             }
 
@@ -135,7 +138,7 @@ fn main() {
     let handle = launcher.get_external_handle();
     spawn(move || loop {
         handle.submit_command(Selector::NOOP, (), Target::Auto);
-        std::thread::sleep(Duration::from_millis(1000 / 60));
+        std::thread::sleep(Duration::from_millis(1000 / FPS));
     });
 
     launcher
